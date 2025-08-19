@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Caucasus oral histories - catalogue demo</title>
+    <!-- Tailwind CDN for quick prototyping -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* simple multi-line clamp fallback */
+      .summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    </style>
+  </head>
+  <body class="bg-neutral-50 text-neutral-900">
+    <div id="root"></div>
+
+    <!-- React 18 UMD builds -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for in-browser JSX transform (fine for demos) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useMemo, useState } = React;
+
+      const ITEMS = [
+        {
+          id: "AA-2010-001",
+          title: "Life after return to Aghdam",
+          summary:
+            "A testimony about rebuilding livelihoods after displacement, covering housing, schooling and access to services. Neutral descriptive metadata only.",
+          themes: ["Displacement", "Livelihoods", "Memory"],
+          year: 2010,
+          period: "2000s",
+          location: "Aghdam district, Azerbaijan",
+          country: "Azerbaijan",
+          language: ["Azerbaijani"],
+          sensitivity: "Restricted",
+          warnings: ["Trauma"],
+          owner: "Partner B",
+          transcript: "Partial",
+          access: "Non-commercial use with citation",
+          duration: "00:47",
+        },
+        {
+          id: "AA-1996-014",
+          title: "Negotiation mechanics in the late 1990s",
+          summary:
+            "An interview with a former track-two participant describing informal meeting formats and confidence-building ideas discussed at the time.",
+          themes: ["Negotiations", "Process", "Track-two"],
+          year: 1996,
+          period: "1990s",
+          location: "Yerevan, Armenia",
+          country: "Armenia",
+          language: ["Armenian", "Russian"],
+          sensitivity: "Open",
+          warnings: ["None"],
+          owner: "Partner A",
+          transcript: "None",
+          access: "Contact owner for conditions",
+          duration: "01:12",
+        },
+        {
+          id: "AA-2021-072",
+          title: "Living with loss after 2020",
+          summary:
+            "A personal account of grief, community support and navigating state services in the immediate post-war period.",
+          themes: ["Post-war", "Social services", "Mental health"],
+          year: 2021,
+          period: "2020s",
+          location: "Syunik region, Armenia",
+          country: "Armenia",
+          language: ["Armenian", "English"],
+          sensitivity: "High risk",
+          warnings: ["Trauma", "Violence"],
+          owner: "Partner C",
+          transcript: "Redacted excerpt",
+          access: "Embargoed excerpts only",
+          duration: "00:34",
+        },
+        {
+          id: "AA-2014-029",
+          title: "Youth and cross-border dialogue",
+          summary:
+            "A facilitated discussion among students reflecting on stereotypes, media narratives and safe formats for exchange.",
+          themes: ["Youth", "Dialogue", "Media"],
+          year: 2014,
+          period: "2010s",
+          location: "Tbilisi, Georgia",
+          country: "Cross-border",
+          language: ["English", "Russian"],
+          sensitivity: "Restricted",
+          warnings: ["None"],
+          owner: "Partner D",
+          transcript: "Full on request",
+          access: "Non-commercial with attribution",
+          duration: "00:58",
+        },
+        {
+          id: "AA-2005-011",
+          title: "Women and livelihood strategies",
+          summary:
+            "Small enterprise, care responsibilities and informal support networks in rural settings.",
+          themes: ["Women, peace and security", "Livelihoods"],
+          year: 2005,
+          period: "2000s",
+          location: "Shirak region, Armenia",
+          country: "Armenia",
+          language: ["Armenian"],
+          sensitivity: "Open",
+          warnings: ["None"],
+          owner: "Partner A",
+          transcript: "Partial",
+          access: "CC BY for metadata only",
+          duration: "00:39",
+        },
+        {
+          id: "AA-2023-101",
+          title: "Return and reconstruction planning",
+          summary:
+            "A municipal official outlines service restoration plans, constraints and civil society input after displacement.",
+          themes: ["Governance", "Return", "Infrastructure"],
+          year: 2023,
+          period: "2020s",
+          location: "Fuzuli district, Azerbaijan",
+          country: "Azerbaijan",
+          language: ["Azerbaijani", "English"],
+          sensitivity: "Restricted",
+          warnings: ["None"],
+          owner: "Partner B",
+          transcript: "None",
+          access: "Contact owner",
+          duration: "00:42",
+        },
+        {
+          id: "AA-2012-055",
+          title: "Media narratives and bias awareness",
+          summary:
+            "A media educator discusses classroom techniques for source evaluation and bias recognition.",
+          themes: ["Media", "Education"],
+          year: 2012,
+          period: "2010s",
+          location: "Baku, Azerbaijan",
+          country: "Azerbaijan",
+          language: ["Azerbaijani", "Russian"],
+          sensitivity: "Open",
+          warnings: ["None"],
+          owner: "Partner E",
+          transcript: "Full on request",
+          access: "Non-commercial with attribution",
+          duration: "00:51",
+        },
+        {
+          id: "AA-1993-003",
+          title: "Displacement routes in the early 1990s",
+          summary:
+            "An oral history of evacuation, temporary shelter and family separation in the first phase of the conflict.",
+          themes: ["Displacement", "Humanitarian"],
+          year: 1993,
+          period: "1990s",
+          location: "Various",
+          country: "Cross-border",
+          language: ["Armenian", "Azerbaijani"],
+          sensitivity: "Restricted",
+          warnings: ["Trauma"],
+          owner: "Partner F",
+          transcript: "None",
+          access: "Case-by-case",
+          duration: "01:05",
+        },
+      ];
+
+      const THEMES = [
+        "Displacement",
+        "Livelihoods",
+        "Memory",
+        "Negotiations",
+        "Process",
+        "Track-two",
+        "Post-war",
+        "Social services",
+        "Mental health",
+        "Youth",
+        "Dialogue",
+        "Media",
+        "Women, peace and security",
+        "Governance",
+        "Return",
+        "Infrastructure",
+        "Education",
+        "Humanitarian",
+      ];
+
+      const PERIODS = ["1990s", "2000s", "2010s", "2020s"];
+
+      function App() {
+        const [query, setQuery] = useState("");
+        const [theme, setTheme] = useState("");
+        const [period, setPeriod] = useState("");
+        const [language, setLanguage] = useState("");
+        const [country, setCountry] = useState("");
+        const [includeHighRisk, setIncludeHighRisk] = useState(false);
+        const [sort, setSort] = useState("Newest");
+        const [selected, setSelected] = useState(null);
+        const [showRequest, setShowRequest] = useState(false);
+        const [requestSubmitted, setRequestSubmitted] = useState(false);
+
+        const languages = useMemo(() => {
+          const set = new Set();
+          ITEMS.forEach((i) => i.language.forEach((l) => set.add(l)));
+          return Array.from(set).sort();
+        }, []);
+
+        const countries = ["Armenia", "Azerbaijan", "Cross-border"];
+
+        const filtered = useMemo(() => {
+          let list = ITEMS.filter((i) => {
+            const text = (i.title + " " + i.summary).toLowerCase();
+            const q = query.trim().toLowerCase();
+            if (q && !text.includes(q)) return false;
+            if (theme && !i.themes.includes(theme)) return false;
+            if (period && i.period !== period) return false;
+            if (language && !i.language.includes(language)) return false;
+            if (country && i.country !== country) return false;
+            if (!includeHighRisk && i.sensitivity === "High risk") return false;
+            return true;
+          });
+          list.sort((a, b) => (sort === "Newest" ? b.year - a.year : a.year - b.year));
+          return list;
+        }, [query, theme, period, language, country, includeHighRisk, sort]);
+
+        return (
+          <div className="min-h-screen">
+            <TopBanner />
+            <Header />
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-8">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <aside className="lg:col-span-1 bg-white rounded-2xl shadow p-4 h-fit sticky top-4">
+                  <h2 className="text-lg font-semibold mb-3">Refine results</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm mb-1" htmlFor="q">Search catalogue</label>
+                      <input
+                        id="q"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Type a keyword..."
+                        className="w-full rounded-xl border border-neutral-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-800"
+                      />
+                    </div>
+                    <Select label="Theme" value={theme} onChange={setTheme} options={["", ...THEMES]} />
+                    <Select label="Period" value={period} onChange={setPeriod} options={["", ...PERIODS]} />
+                    <Select label="Language" value={language} onChange={setLanguage} options={["", ...languages]} />
+                    <Select label="Country" value={country} onChange={setCountry} options={["", "Armenia", "Azerbaijan", "Cross-border"]} />
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="highrisk"
+                        type="checkbox"
+                        checked={includeHighRisk}
+                        onChange={(e) => setIncludeHighRisk(e.target.checked)}
+                        className="h-4 w-4"
+                      />
+                      <label htmlFor="highrisk" className="text-sm">Include high risk records</label>
+                    </div>
+                    <div>
+                      <label className="block text-sm mb-1" htmlFor="sort">Sort by</label>
+                      <select
+                        id="sort"
+                        value={sort}
+                        onChange={(e) => setSort(e.target.value)}
+                        className="w-full rounded-xl border border-neutral-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-800"
+                      >
+                        <option>Newest</option>
+                        <option>Oldest</option>
+                      </select>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setQuery("");
+                        setTheme("");
+                        setPeriod("");
+                        setLanguage("");
+                        setCountry("");
+                        setIncludeHighRisk(false);
+                        setSort("Newest");
+                      }}
+                      className="w-full mt-2 rounded-xl border px-3 py-2 text-sm hover:bg-neutral-100"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                </aside>
+
+                <main className="lg:col-span-3">
+                  <div className="flex items-end justify-between mb-4">
+                    <div>
+                      <h1 className="text-2xl font-bold">Browse catalogue</h1>
+                      <p className="text-sm text-neutral-600">{filtered.length} result{filtered.length === 1 ? "" : "s"} shown</p>
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filtered.map((item) => (
+                      <article
+                        key={item.id}
+                        className="bg-white rounded-2xl shadow p-4 hover:shadow-md transition cursor-pointer border border-neutral-100"
+                        onClick={() => {
+                          setSelected(item);
+                          setShowRequest(false);
+                          setRequestSubmitted(false);
+                        }}
+                        aria-label={"Open record " + item.title}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 border">{item.period}</span>
+                          <SensitivityBadge level={item.sensitivity} />
+                        </div>
+                        <h3 className="mt-3 text-lg font-semibold leading-tight">{item.title}</h3>
+                        <p className="mt-2 text-sm text-neutral-700 summary">{item.summary}</p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {item.themes.slice(0, 3).map((t) => (
+                            <span key={t} className="text-xs px-2 py-1 rounded-full bg-neutral-50 border">{t}</span>
+                          ))}
+                        </div>
+                        <dl className="mt-4 grid grid-cols-2 gap-2 text-xs text-neutral-600">
+                          <div className="bg-neutral-50 rounded-xl p-2">
+                            <dt className="font-medium">Year</dt>
+                            <dd>{item.year}</dd>
+                          </div>
+                          <div className="bg-neutral-50 rounded-xl p-2">
+                            <dt className="font-medium">Language</dt>
+                            <dd>{item.language.join(", ")}</dd>
+                          </div>
+                          <div className="bg-neutral-50 rounded-xl p-2">
+                            <dt className="font-medium">Country</dt>
+                            <dd>{item.country}</dd>
+                          </div>
+                          <div className="bg-neutral-50 rounded-xl p-2">
+                            <dt className="font-medium">Owner</dt>
+                            <dd>{item.owner}</dd>
+                          </div>
+                        </dl>
+                        <div className="mt-3 text-xs text-neutral-600">
+                          <strong>Content warnings:</strong> {item.warnings.join(", ")}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 flex items-center justify-between text-sm text-neutral-600">
+                    <p>Showing {filtered.length} item{filtered.length === 1 ? "" : "s"}</p>
+                    <div className="flex gap-2">
+                      <button className="rounded-xl border px-3 py-2 hover:bg-neutral-100">Previous</button>
+                      <button className="rounded-xl border px-3 py-2 hover:bg-neutral-100">Next</button>
+                    </div>
+                  </div>
+                </main>
+              </div>
+            </div>
+
+            {selected && (
+              <DetailModal
+                item={selected}
+                onClose={() => setSelected(null)}
+                onRequest={() => setShowRequest(true)}
+              >
+                {showRequest ? (
+                  <RequestForm
+                    itemId={selected.id}
+                    onCancel={() => setShowRequest(false)}
+                    onSubmit={() => {
+                      setRequestSubmitted(true);
+                      setShowRequest(false);
+                    }}
+                  />
+                ) : requestSubmitted ? (
+                  <RequestSubmitted />
+                ) : null}
+              </DetailModal>
+            )}
+
+            <Footer />
+          </div>
+        );
+      }
+
+      function TopBanner() {
+        return (
+          <div className="bg-amber-50 border-b border-amber-200">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2 text-sm text-amber-900">
+              Demo mock for illustration only - no real personal data or video materials
+            </div>
+          </div>
+        );
+      }
+
+      function Header() {
+        return (
+          <header className="bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-10 border-b">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-xl bg-neutral-900 text-white grid place-items-center font-bold">CA</div>
+                <div>
+                  <p className="text-xl font-bold leading-tight">Caucasus oral histories</p>
+                  <p className="text-xs text-neutral-600">Open catalogue of interviews - metadata only</p>
+                </div>
+              </div>
+              <nav className="hidden md:flex items-center gap-6 text-sm text-neutral-700">
+                <a className="hover:text-neutral-900" href="#">Browse</a>
+                <a className="hover:text-neutral-900" href="#">Collections</a>
+                <a className="hover:text-neutral-900" href="#">About</a>
+                <a className="hover:text-neutral-900" href="#">Policy</a>
+              </nav>
+            </div>
+          </header>
+        );
+      }
+
+      function Footer() {
+        return (
+          <footer className="mt-12 border-t">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 grid md:grid-cols-3 gap-6 text-sm text-neutral-700">
+              <div>
+                <p className="font-semibold">About this project</p>
+                <p className="mt-2">A discovery tool for researchers, journalists and students interested in Armenia-Azerbaijan conflict histories.</p>
+              </div>
+              <div>
+                <p className="font-semibold">Policies</p>
+                <ul className="mt-2 space-y-1">
+                  <li><a href="#" className="hover:underline">Privacy notice</a></li>
+                  <li><a href="#" className="hover:underline">Terms of use</a></li>
+                  <li><a href="#" className="hover:underline">Takedown policy</a></li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold">Contact</p>
+                <p className="mt-2">For general queries use the contact form on the About page. For access to a specific item please use the request access button on that item page.</p>
+              </div>
+            </div>
+          </footer>
+        );
+      }
+
+      function SensitivityBadge({ level }) {
+        const classes =
+          level === "Open"
+            ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+            : level === "Restricted"
+            ? "bg-amber-50 border-amber-200 text-amber-800"
+            : "bg-rose-50 border-rose-200 text-rose-800";
+        return <span className={"text-xs px-2 py-1 rounded-full border " + classes}>{level}</span>;
+      }
+
+      function Select({ label, value, onChange, options }) {
+        return (
+          <div>
+            <label className="block text-sm mb-1">{label}</label>
+            <select
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              className="w-full rounded-xl border border-neutral-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-800"
+            >
+              {options.map((opt, idx) => (
+                <option key={idx} value={typeof opt === "string" ? opt : opt}>
+                  {opt === "" ? "Any" : opt}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+      }
+
+      function DetailModal({ item, onClose, onRequest, children }) {
+        return (
+          <div className="fixed inset-0 z-20">
+            <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
+            <div className="absolute right-0 top-0 h-full w-full sm:w-[520px] bg-white shadow-xl p-6 overflow-y-auto">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <SensitivityBadge level={item.sensitivity} />
+                    <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 border">{item.period}</span>
+                  </div>
+                  <h2 className="mt-3 text-xl font-semibold leading-tight">{item.title}</h2>
+                  <p className="text-sm text-neutral-600">{item.location} - {item.year}</p>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="rounded-xl border px-3 py-2 text-sm hover:bg-neutral-100"
+                  aria-label="Close details"
+                >
+                  Close
+                </button>
+              </div>
+
+              <section className="mt-4 space-y-4">
+                <p className="text-sm">{item.summary}</p>
+
+                <dl className="grid grid-cols-2 gap-3 text-sm">
+                  <InfoTile label="Themes" value={item.themes.join(", ")} />
+                  <InfoTile label="Language" value={item.language.join(", ")} />
+                  <InfoTile label="Owner" value={item.owner} />
+                  <InfoTile label="Transcript" value={item.transcript} />
+                  <InfoTile label="Duration" value={item.duration} />
+                  <InfoTile label="Access" value={item.access} />
+                </dl>
+
+                <div className="text-sm"><strong>Content warnings:</strong> {item.warnings.join(", ")}</div>
+
+                <div className="rounded-2xl bg-neutral-50 border p-3 text-sm">
+                  This catalogue holds metadata only. To view or use the material please submit a request to the rights holder. Approval is at the discretion of the owner.
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={onRequest}
+                    className="rounded-xl px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-800"
+                  >
+                    Request access
+                  </button>
+                  <button className="rounded-xl px-4 py-2 border hover:bg-neutral-100">Copy citation</button>
+                </div>
+
+                {children}
+              </section>
+            </div>
+          </div>
+        );
+      }
+
+      function InfoTile({ label, value }) {
+        return (
+          <div className="bg-white rounded-xl border p-3">
+            <div className="text-xs text-neutral-600">{label}</div>
+            <div className="font-medium">{value}</div>
+          </div>
+        );
+      }
+
+      function RequestForm({ itemId, onCancel, onSubmit }) {
+        return (
+          <form
+            className="mt-4 border-t pt-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmit();
+            }}
+          >
+            <h3 className="text-lg font-semibold mb-2">Request access</h3>
+            <p className="text-sm text-neutral-600 mb-4">Item ID: {itemId}</p>
+            <div className="grid grid-cols-1 gap-3">
+              <LabeledInput id="name" label="Your name" required />
+              <LabeledInput id="email" type="email" label="Email" required />
+              <LabeledInput id="affil" label="Affiliation or independent" />
+              <LabeledInput id="purpose" label="Intended use" placeholder="E.g. dissertation chapter on post-war livelihoods" />
+              <LabeledInput id="deadline" type="date" label="Deadline (optional)" />
+              <div className="flex items-center gap-2">
+                <input id="consent" type="checkbox" required className="h-4 w-4" />
+                <label htmlFor="consent" className="text-sm">I acknowledge the content warnings and agree to respect the access conditions</label>
+              </div>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button type="submit" className="rounded-xl px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-800">Submit request</button>
+              <button type="button" onClick={onCancel} className="rounded-xl px-4 py-2 border hover:bg-neutral-100">Cancel</button>
+            </div>
+          </form>
+        );
+      }
+
+      function LabeledInput({ id, label, type = "text", required = false, placeholder = "" }) {
+        return (
+          <div>
+            <label className="block text-sm mb-1" htmlFor={id}>{label}{required ? " *" : ""}</label>
+            <input
+              id={id}
+              type={type}
+              placeholder={placeholder}
+              required={required}
+              className="w-full rounded-xl border border-neutral-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-800"
+            />
+          </div>
+        );
+      }
+
+      function RequestSubmitted() {
+        return (
+          <div className="mt-4 border-t pt-4 rounded-2xl bg-emerald-50 border-emerald-200 p-3 text-sm text-emerald-900">
+            Your request has been noted in this demo. In production it would be routed to the rights holder and you would receive a confirmation email.
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
