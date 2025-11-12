@@ -5,9 +5,11 @@ const ITEMS = [
   {
     id: "AA-2010-001",
     title: "Life after return to Aghdam",
+    interviewee: "Leyla M.",
     summary:
       "A testimony about rebuilding livelihoods after displacement, covering housing, schooling and access to services. Neutral descriptive metadata only.",
     themes: ["Displacement", "Livelihoods", "Memory"],
+    tags: ["IDP", "return", "housing", "education", "reconstruction"],
     year: 2010,
     period: "2000s",
     location: "Aghdam district, Azerbaijan",
@@ -23,9 +25,11 @@ const ITEMS = [
   {
     id: "AA-1996-014",
     title: "Negotiation mechanics in the late 1990s",
+    interviewee: "Dr. Armen K.",
     summary:
       "An interview with a former track-two participant describing informal meeting formats and confidence-building ideas discussed at the time.",
     themes: ["Negotiations", "Process", "Track-two"],
+    tags: ["diplomacy", "conflict resolution", "track-two", "CBMs", "1990s peace process"],
     year: 1996,
     period: "1990s",
     location: "Yerevan, Armenia",
@@ -41,9 +45,11 @@ const ITEMS = [
   {
     id: "AA-2021-072",
     title: "Living with loss after 2020",
+    interviewee: "Anahit S.",
     summary:
       "A personal account of grief, community support and navigating state services in the immediate post-war period.",
     themes: ["Post-war", "Social services", "Mental health"],
+    tags: ["2020 war", "grief", "psychological support", "community resilience", "displacement"],
     year: 2021,
     period: "2020s",
     location: "Syunik region, Armenia",
@@ -59,9 +65,11 @@ const ITEMS = [
   {
     id: "AA-2014-029",
     title: "Youth and cross-border dialogue",
+    interviewee: "Nino T. & Orkhan A.",
     summary:
       "A facilitated discussion among students reflecting on stereotypes, media narratives and safe formats for exchange.",
     themes: ["Youth", "Dialogue", "Media"],
+    tags: ["youth engagement", "stereotypes", "media literacy", "cross-border", "peacebuilding"],
     year: 2014,
     period: "2010s",
     location: "Tbilisi, Georgia",
@@ -77,9 +85,11 @@ const ITEMS = [
   {
     id: "AA-2005-011",
     title: "Women and livelihood strategies",
+    interviewee: "Maro V.",
     summary:
       "Small enterprise, care responsibilities and informal support networks in rural settings.",
     themes: ["Women, peace and security", "Livelihoods"],
+    tags: ["women's economic empowerment", "rural livelihoods", "informal economy", "care work", "WPS"],
     year: 2005,
     period: "2000s",
     location: "Shirak region, Armenia",
@@ -95,9 +105,11 @@ const ITEMS = [
   {
     id: "AA-2023-101",
     title: "Return and reconstruction planning",
+    interviewee: "Rashad M.",
     summary:
       "A municipal official outlines service restoration plans, constraints and civil society input after displacement.",
     themes: ["Governance", "Return", "Infrastructure"],
+    tags: ["municipal governance", "reconstruction", "civil society", "service delivery", "post-conflict planning"],
     year: 2023,
     period: "2020s",
     location: "Fuzuli district, Azerbaijan",
@@ -113,9 +125,11 @@ const ITEMS = [
   {
     id: "AA-2012-055",
     title: "Media narratives and bias awareness",
+    interviewee: "Farid J.",
     summary:
       "A media educator discusses classroom techniques for source evaluation and bias recognition.",
     themes: ["Media", "Education"],
+    tags: ["media literacy", "critical thinking", "bias", "education", "information warfare"],
     year: 2012,
     period: "2010s",
     location: "Baku, Azerbaijan",
@@ -131,9 +145,11 @@ const ITEMS = [
   {
     id: "AA-1993-003",
     title: "Displacement routes in the early 1990s",
+    interviewee: "Samvel H.",
     summary:
       "An oral history of evacuation, temporary shelter and family separation in the first phase of the conflict.",
     themes: ["Displacement", "Humanitarian"],
+    tags: ["forced displacement", "1990s conflict", "refugees", "family separation", "humanitarian crisis"],
     year: 1993,
     period: "1990s",
     location: "Various",
@@ -193,7 +209,7 @@ export default function ArchiveCatalogueDemo() {
 
   const filtered = useMemo(() => {
     let list = ITEMS.filter((i) => {
-      const text = `${i.title} ${i.summary}`.toLowerCase();
+      const text = `${i.title} ${i.summary} ${i.interviewee} ${i.tags.join(" ")}`.toLowerCase();
       const q = query.trim().toLowerCase();
       if (q && !text.includes(q)) return false;
       if (theme && !i.themes.includes(theme)) return false;
@@ -214,123 +230,102 @@ export default function ArchiveCatalogueDemo() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <aside className="lg:col-span-1 bg-white rounded-2xl shadow p-4 h-fit sticky top-4">
-            <h2 className="text-lg font-semibold mb-3">Refine results</h2>
+            <h2 className="text-lg font-semibold mb-4">Filters</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1" htmlFor="q">Search catalogue</label>
-                <input
-                  id="q"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Type a keyword..."
-                  className="w-full rounded-xl border border-neutral-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-800"
-                />
-              </div>
-              <Select label="Theme" value={theme} onChange={setTheme} options={["", ...THEMES]} />
-              <Select label="Period" value={period} onChange={setPeriod} options={["", ...PERIODS]} />
-              <Select label="Language" value={language} onChange={setLanguage} options={["", ...languages]} />
-              <Select label="Country" value={country} onChange={setCountry} options={["", ...countries]} />
+              <Select
+                label="Theme"
+                value={theme}
+                onChange={setTheme}
+                options={["", ...THEMES]}
+              />
+              <Select
+                label="Period"
+                value={period}
+                onChange={setPeriod}
+                options={["", ...PERIODS]}
+              />
+              <Select
+                label="Language"
+                value={language}
+                onChange={setLanguage}
+                options={["", ...languages]}
+              />
+              <Select
+                label="Country"
+                value={country}
+                onChange={setCountry}
+                options={["", ...countries]}
+              />
               <div className="flex items-center gap-2">
                 <input
-                  id="highrisk"
+                  id="high-risk"
                   type="checkbox"
                   checked={includeHighRisk}
                   onChange={(e) => setIncludeHighRisk(e.target.checked)}
                   className="h-4 w-4"
                 />
-                <label htmlFor="highrisk" className="text-sm">Include high risk records</label>
+                <label htmlFor="high-risk" className="text-sm">
+                  Include high-risk items
+                </label>
               </div>
-              <div>
-                <label className="block text-sm mb-1" htmlFor="sort">Sort by</label>
-                <select
-                  id="sort"
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value)}
-                  className="w-full rounded-xl border border-neutral-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-800"
-                >
-                  <option>Newest</option>
-                  <option>Oldest</option>
-                </select>
-              </div>
-              <button
-                onClick={() => {
-                  setQuery("");
-                  setTheme("");
-                  setPeriod("");
-                  setLanguage("");
-                  setCountry("");
-                  setIncludeHighRisk(false);
-                  setSort("Newest");
-                }}
-                className="w-full mt-2 rounded-xl border px-3 py-2 text-sm hover:bg-neutral-100"
-              >
-                Clear all
-              </button>
             </div>
           </aside>
 
           <main className="lg:col-span-3">
-            <div className="flex items-end justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-bold">Browse catalogue</h1>
-                <p className="text-sm text-neutral-600">{filtered.length} result{filtered.length === 1 ? "" : "s"} shown</p>
-              </div>
+            <div className="bg-white rounded-2xl shadow p-4 mb-4 flex flex-wrap gap-3 items-center">
+              <input
+                type="text"
+                placeholder="Search catalogue..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="flex-1 min-w-[200px] rounded-xl border border-neutral-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neutral-800"
+              />
+              <Select
+                label=""
+                value={sort}
+                onChange={setSort}
+                options={["Newest", "Oldest"]}
+              />
             </div>
 
-            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="text-sm mb-4">
+              Showing {filtered.length} of {ITEMS.length} items
+            </div>
+
+            <div className="space-y-4">
               {filtered.map((item) => (
                 <article
                   key={item.id}
-                  className="bg-white rounded-2xl shadow p-4 hover:shadow-md transition cursor-pointer border border-neutral-100"
-                  onClick={() => {
-                    setSelected(item);
-                    setShowRequest(false);
-                    setRequestSubmitted(false);
-                  }}
-                  aria-label={`Open record ${item.title}`}
+                  className="bg-white rounded-2xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+                  onClick={() => setSelected(item)}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 border">{item.period}</span>
-                    <SensitivityBadge level={item.sensitivity} />
-                  </div>
-                  <h3 className="mt-3 text-lg font-semibold leading-tight">{item.title}</h3>
-                  <p className="mt-2 text-sm text-neutral-700 line-clamp-3">{item.summary}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {item.themes.slice(0, 3).map((t) => (
-                      <span key={t} className="text-xs px-2 py-1 rounded-full bg-neutral-50 border">{t}</span>
-                    ))}
-                  </div>
-                  <dl className="mt-4 grid grid-cols-2 gap-2 text-xs text-neutral-600">
-                    <div className="bg-neutral-50 rounded-xl p-2">
-                      <dt className="font-medium">Year</dt>
-                      <dd>{item.year}</dd>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <SensitivityBadge level={item.sensitivity} />
+                        <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 border">
+                          {item.period}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-semibold mb-1">{item.title}</h3>
+                      <p className="text-sm text-neutral-600 mb-2">
+                        <strong>Interviewee:</strong> {item.interviewee} | {item.location} - {item.year}
+                      </p>
+                      <p className="text-sm summary mb-2">{item.summary}</p>
+                      <div className="flex flex-wrap gap-1 text-xs">
+                        {item.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-1 rounded-full bg-neutral-100 text-neutral-700"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <div className="bg-neutral-50 rounded-xl p-2">
-                      <dt className="font-medium">Language</dt>
-                      <dd>{item.language.join(", ")}</dd>
-                    </div>
-                    <div className="bg-neutral-50 rounded-xl p-2">
-                      <dt className="font-medium">Country</dt>
-                      <dd>{item.country}</dd>
-                    </div>
-                    <div className="bg-neutral-50 rounded-xl p-2">
-                      <dt className="font-medium">Owner</dt>
-                      <dd>{item.owner}</dd>
-                    </div>
-                  </dl>
-                  <div className="mt-3 text-xs text-neutral-600">
-                    <strong>Content warnings:</strong> {item.warnings.join(", ")}
                   </div>
                 </article>
               ))}
-            </div>
-
-            <div className="mt-6 flex items-center justify-between text-sm text-neutral-600">
-              <p>Showing {filtered.length} item{filtered.length === 1 ? "" : "s"}</p>
-              <div className="flex gap-2">
-                <button className="rounded-xl border px-3 py-2 hover:bg-neutral-100">Previous</button>
-                <button className="rounded-xl border px-3 py-2 hover:bg-neutral-100">Next</button>
-              </div>
             </div>
           </main>
         </div>
@@ -339,15 +334,21 @@ export default function ArchiveCatalogueDemo() {
       {selected && (
         <DetailModal
           item={selected}
-          onClose={() => setSelected(null)}
+          onClose={() => {
+            setSelected(null);
+            setShowRequest(false);
+            setRequestSubmitted(false);
+          }}
           onRequest={() => setShowRequest(true)}
         >
-          {showRequest ? (
+          {showRequest && !requestSubmitted ? (
             <RequestForm
               itemId={selected.id}
-              onCancel={() => setShowRequest(false)}
               onSubmit={() => {
                 setRequestSubmitted(true);
+                setShowRequest(false);
+              }}
+              onCancel={() => {
                 setShowRequest(false);
               }}
             />
@@ -429,7 +430,7 @@ function SensitivityBadge({ level }: { level: string }) {
 function Select({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: (string | readonly string[])[]; }) {
   return (
     <div>
-      <label className="block text-sm mb-1">{label}</label>
+      {label && <label className="block text-sm mb-1">{label}</label>}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -457,6 +458,9 @@ function DetailModal({ item, onClose, onRequest, children }: { item: any; onClos
               <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 border">{item.period}</span>
             </div>
             <h2 className="mt-3 text-xl font-semibold leading-tight">{item.title}</h2>
+            <p className="text-sm text-neutral-600 mt-1">
+              <strong>Interviewee:</strong> {item.interviewee}
+            </p>
             <p className="text-sm text-neutral-600">{item.location} - {item.year}</p>
           </div>
           <button
@@ -479,6 +483,20 @@ function DetailModal({ item, onClose, onRequest, children }: { item: any; onClos
             <InfoTile label="Duration" value={item.duration} />
             <InfoTile label="Access" value={item.access} />
           </dl>
+
+          <div className="text-sm">
+            <strong>Tags:</strong>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {item.tags.map((tag: string) => (
+                <span
+                  key={tag}
+                  className="px-2 py-1 rounded-full bg-neutral-100 text-neutral-700 text-xs"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
 
           <div className="text-sm"><strong>Content warnings:</strong> {item.warnings.join(", ")}</div>
 
